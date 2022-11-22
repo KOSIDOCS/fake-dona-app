@@ -1,9 +1,13 @@
+import 'package:fake_dona_app/blocs/theme/theme_bloc.dart';
+import 'package:fake_dona_app/blocs/theme/theme_event.dart';
 import 'package:fake_dona_app/core/custom_colors.dart';
 import 'package:fake_dona_app/models/bar_model.dart';
+import 'package:fake_dona_app/models/theme_tab.dart';
 import 'package:fake_dona_app/widgets/custom_bar.dart';
 import 'package:fake_dona_app/widgets/theme_changer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ionicons/ionicons.dart';
 
 class MainScreen extends StatefulWidget {
@@ -201,6 +205,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final themeBloc = BlocProvider.of<ThemeBloc>(context);
     bool isHideSideBar = MediaQuery.of(context).size.width < 600;
 
     if (isHideSideBar) {
@@ -210,7 +215,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFeeeff1),
+      //backgroundColor: const Color(0xFFeeeff1),
+      backgroundColor: Theme.of(context).backgroundColor,
       body: Stack(
         children: [
           Flex(
@@ -244,7 +250,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         vertical: 15,
                       ),
                       decoration: BoxDecoration(
-                        color: BrandColors.kBrandPureWhite,
+                        //color: BrandColors.kBrandPureWhite,
+                        color: Theme.of(context).scaffoldBackgroundColor,
                         // border: Border.all(
                         //   color: BrandColors.kBrandPureWhite,
                         //   width: 1,
@@ -274,6 +281,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                 title: _barModels[i].title,
                                 color: _barModels[i].color,
                                 emoji: _barModels[i].emoji,
+                                iconColor: Colors.red,
                                 onPressed: () {
                                   if (kDebugMode) {
                                     print('index: $i');
@@ -298,6 +306,28 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   color: const Color(0xFFeeeff1),
                   height: MediaQuery.of(context).size.height,
                   width: MediaQuery.of(context).size.width,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => {
+                          themeBloc.add(LightTab(ThemeTab.values[0])),
+                        },
+                        icon: const Icon(Icons.menu),
+                      ),
+                      IconButton(
+                        onPressed: () => {
+                          themeBloc.add(DarkTab(ThemeTab.values[1])),
+                        },
+                        icon: const Icon(Icons.menu),
+                      ),
+                      IconButton(
+                        onPressed: () => {
+                          themeBloc.add(BlackTab(ThemeTab.values[2])),
+                        },
+                        icon: const Icon(Icons.menu),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -324,7 +354,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     maxWidth: 300,
                   ),
                   decoration: BoxDecoration(
-                    color: BrandColors.kBrandPureWhite,
+                    //color: BrandColors.kBrandPureWhite,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Opacity(
@@ -335,10 +366,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         Container(
                           height: MediaQuery.of(context).size.height,
                           width: 240,
-                          decoration: const BoxDecoration(
-                            //color: BrandColors.kBlueColor,
-                            color: BrandColors.kBrandPureWhite,
-                            borderRadius: BorderRadius.only(
+                          decoration: BoxDecoration(
+                            //color: BrandColors.kBrandPureWhite,
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(15),
                               bottomLeft: Radius.circular(15),
                             ),

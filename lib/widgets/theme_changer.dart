@@ -1,4 +1,8 @@
+import 'package:fake_dona_app/blocs/blocs.dart';
+import 'package:fake_dona_app/core/custom_colors.dart';
+import 'package:fake_dona_app/models/models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ThemeChanger extends StatefulWidget {
   final int? indicatorCount;
@@ -34,6 +38,7 @@ class _ThemeChangerState extends State<ThemeChanger>
   late Animation<Color?> _colorAnimation;
   late Animation<double> _sizeAnimation;
   late Animation<double> _paddingAnimation;
+  late Animation<Color?> _textColorDarkAnimation;
 
   @override
   void initState() {
@@ -83,6 +88,20 @@ class _ThemeChangerState extends State<ThemeChanger>
         curve: Curves.easeInOut,
       ),
     );
+
+    _textColorDarkAnimation = ColorTween(
+      begin: BrandColors.kBrandPureWhite,
+      end: const Color(0xFF1379D9),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(
+          0.0,
+          1.0,
+          curve: Curves.easeInOut,
+        ),
+      ),
+    );
   }
 
   @override
@@ -96,107 +115,115 @@ class _ThemeChangerState extends State<ThemeChanger>
     widget.index == widget.currentIndex
         ? _controller.forward()
         : _controller.reverse();
-    return GestureDetector(
-      onTap: () {
-        // _controller.forward();
-        widget.onTap!();
-      },
-      child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 130,
-                  width: 160,
-                  margin: const EdgeInsets.only(right: 18),
-                  padding: const EdgeInsets.only(
-                    left: 10,
-                    right: 10,
-                    top: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: widget.bgColor ??
-                        (widget.isAuto == true
-                            ? null
-                            : Colors.grey.withOpacity(0.2)),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: _borderAnimation.value!,
-                      width: 2.5,
+    return BlocBuilder<ThemeBloc, ThemeTab>(builder: (context, activeTab) {
+      return GestureDetector(
+        onTap: () {
+          // _controller.forward();
+          widget.onTap!();
+        },
+        child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 130,
+                    width: 160,
+                    margin: const EdgeInsets.only(right: 18),
+                    padding: const EdgeInsets.only(
+                      left: 10,
+                      right: 10,
+                      top: 10,
                     ),
-                    gradient: widget.isAuto == true
-                        ? const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.topRight,
-                            stops: [0.5, 0.3],
-                            colors: [
-                              Color(0xFFecedee),
-                              Colors.black,
-                            ],
-                          )
-                        : null,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 1,
-                        offset: const Offset(0, 0),
+                    decoration: BoxDecoration(
+                      color: widget.bgColor ??
+                          (widget.isAuto == true
+                              ? null
+                              : Colors.grey.withOpacity(0.2)),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _borderAnimation.value!,
+                        width: 2.5,
                       ),
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        top: 0,
-                        child: ThemeWrap(
-                          hideRound: true,
-                          bgColor: widget.topIndicator,
+                      gradient: widget.isAuto == true
+                          ? const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.topRight,
+                              stops: [0.5, 0.3],
+                              colors: [
+                                Color(0xFFecedee),
+                                Colors.black,
+                              ],
+                            )
+                          : null,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 1,
+                          offset: const Offset(0, 0),
                         ),
-                      ),
-                      //const SizedBox(height: 10),
-                      for (int i = 1; i < widget.indicatorCount! + 1; i++) ...[
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
                         Positioned(
-                          top: i == 1 ? 26.0 * i : 24.5 * i,
-                          child: widget.isAuto == true
-                              ? ThemeWrapAuto(
-                                  hideRound: false,
-                                  bgColor: widget.indicatorBgColor,
-                                )
-                              : ThemeWrap(
-                                  hideRound: false,
-                                  bgColor: widget.indicatorBgColor,
-                                ),
+                          top: 0,
+                          child: ThemeWrap(
+                            hideRound: true,
+                            bgColor: widget.topIndicator,
+                          ),
                         ),
-                      ]
-                    ],
+                        //const SizedBox(height: 10),
+                        for (int i = 1;
+                            i < widget.indicatorCount! + 1;
+                            i++) ...[
+                          Positioned(
+                            top: i == 1 ? 26.0 * i : 24.5 * i,
+                            child: widget.isAuto == true
+                                ? ThemeWrapAuto(
+                                    hideRound: false,
+                                    bgColor: widget.indicatorBgColor,
+                                  )
+                                : ThemeWrap(
+                                    hideRound: false,
+                                    bgColor: widget.indicatorBgColor,
+                                  ),
+                          ),
+                        ]
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(right: _paddingAnimation.value),
-                      child: Icon(
-                        Icons.check,
-                        color: _colorAnimation.value,
-                        size: _sizeAnimation.value,
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Padding(
+                        padding:
+                            EdgeInsets.only(right: _paddingAnimation.value),
+                        child: Icon(
+                          Icons.check,
+                          color: _colorAnimation.value,
+                          size: _sizeAnimation.value,
+                        ),
                       ),
-                    ),
-                    Text(
-                      widget.title,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: _colorAnimation.value,
+                      Text(
+                        widget.title,
+                        style: TextStyle(
+                          fontSize: 12,
+                          //color: _colorAnimation.value,
+                          color: activeTab == ThemeTab.light
+                              ? _colorAnimation.value
+                              : _textColorDarkAnimation.value,
+                        ),
                       ),
-                    ),
-                  ],
-                )
-              ],
-            );
-          }),
-    );
+                    ],
+                  )
+                ],
+              );
+            }),
+      );
+    });
   }
 }
 

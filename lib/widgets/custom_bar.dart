@@ -1,5 +1,8 @@
+import 'package:fake_dona_app/blocs/blocs.dart';
 import 'package:fake_dona_app/core/custom_colors.dart';
+import 'package:fake_dona_app/models/models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CustomBtn extends StatefulWidget {
   final int index;
@@ -14,6 +17,7 @@ class CustomBtn extends StatefulWidget {
   final Color? color;
   final String? emoji;
   final bool? hideIcons;
+  final Color? iconColor;
   const CustomBtn({
     Key? key,
     required this.index,
@@ -28,6 +32,7 @@ class CustomBtn extends StatefulWidget {
     this.color,
     this.emoji,
     this.hideIcons = false,
+    this.iconColor,
   }) : super(key: key);
 
   @override
@@ -38,6 +43,7 @@ class _CustomBtnState extends State<CustomBtn>
     with SingleTickerProviderStateMixin {
   late final AnimationController _buttonAnimationController;
   late Animation<Color?> _iconColorAnimation;
+  late Animation<Color?> _iconColorDarkAnimation;
   late Animation<double> _buttonUpAnimation;
   late Animation<Color?> _buttonSelectedAnimation;
 
@@ -63,19 +69,19 @@ class _CustomBtnState extends State<CustomBtn>
       ),
     );
 
-    // _buttonSelectedAnimation = Tween<Color>(
-    //   begin: Colors.black,
-    //   end: Colors.blue,
-    // ).animate(
-    //   CurvedAnimation(
-    //     parent: _buttonAnimationController,
-    //     curve: const Interval(
-    //       0.0,
-    //       0.50,
-    //       curve: Curves.easeInOut,
-    //     ),
-    //   ),
-    // );
+    _iconColorDarkAnimation = ColorTween(
+      begin: widget.iconColor,
+      end: BrandColors.kBtnHoverColor,
+    ).animate(
+      CurvedAnimation(
+        parent: _buttonAnimationController,
+        curve: const Interval(
+          0.0,
+          1.0,
+          curve: Curves.easeInOut,
+        ),
+      ),
+    );
 
     _buttonSelectedAnimation = ColorTween(
       begin: BrandColors.kBrandTextDark.withOpacity(0.0),
@@ -114,248 +120,121 @@ class _CustomBtnState extends State<CustomBtn>
     widget.index == widget.currentIndex
         ? _buttonAnimationController.forward()
         : _buttonAnimationController.reverse();
-    return GestureDetector(
-      onTap: () => widget.onPressed(),
-      child: AnimatedBuilder(
-          animation: _buttonAnimationController,
-          builder: (context, child) {
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.symmetric(
-                // vertical: 10,
-                horizontal: 10,
-              ),
-              margin: const EdgeInsets.only(
-                bottom: 10,
-              ),
-              decoration: BoxDecoration(
-                color: _buttonSelectedAnimation.value,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Stack(
-                children: [
-                  Container(
-                    height: 40,
-                    width: MediaQuery.of(context).size.width,
-                    color: Colors.transparent,
-                  ),
-                  widget.hideIcons == true
-                      ? Container()
-                      : Positioned(
-                          top: 10,
-                          child: Transform.translate(
-                            offset: Offset(0.0, -_buttonUpAnimation.value),
-                            child: widget.icon != null
-                                ? Icon(
-                                    widget.icon,
-                                    color: _iconColorAnimation.value,
-                                    size: 13.0,
-                                  )
-                                : widget.emoji != null
-                                    ? Transform.translate(
-                                        offset: const Offset(0.0, -8.0),
-                                        child: Text(
-                                          widget.emoji!,
-                                          style: const TextStyle(
-                                            fontSize: 17.0,
-                                          ),
-                                        ),
-                                      )
-                                    : Container(
-                                        height: 13.0,
-                                        width: 13.0,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5.9),
-                                          border: Border.all(
-                                            color: widget.color!,
-                                            width: 2.5,
-                                          ),
-                                        ),
-                                      ),
-                          ),
-                        ),
-                  Positioned(
-                    top: 10,
-                    left: widget.hideIcons == true ? 0.0 : 30.0,
-                    child: Text(
-                      widget.title,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                            color: widget.index == widget.currentIndex
-                                ? BrandColors.kBtnHoverColor
-                                : BrandColors.kBrandSecondary,
-                            fontSize: 13.0,
-                          ),
+    return BlocBuilder<ThemeBloc, ThemeTab>(builder: (context, activeTab) {
+      return GestureDetector(
+        onTap: () => widget.onPressed(),
+        child: AnimatedBuilder(
+            animation: _buttonAnimationController,
+            builder: (context, child) {
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(
+                  // vertical: 10,
+                  horizontal: 10,
+                ),
+                margin: const EdgeInsets.only(
+                  bottom: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: _buttonSelectedAnimation.value,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 40,
+                      width: MediaQuery.of(context).size.width,
+                      color: Colors.transparent,
                     ),
-                  ),
-                  widget.hideIcons == true
-                      ? Container()
-                      : Positioned(
-                          top: 10,
-                          right: 0.0,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 4.0,
-                              vertical: 4.0,
-                            ),
-                            decoration: BoxDecoration(
-                              color:
-                                  BrandColors.kBrandTextDark.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            child: Text(
-                              '12',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText1!
-                                  .copyWith(
-                                    color: BrandColors.kBrandSecondary,
-                                    fontSize: 10.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                    widget.hideIcons == true
+                        ? Container()
+                        : Positioned(
+                            top: 10,
+                            child: Transform.translate(
+                              offset: Offset(0.0, -_buttonUpAnimation.value),
+                              child: widget.icon != null
+                                  ? Icon(
+                                      widget.icon,
+                                      //color: _iconColorAnimation.value,
+                                      color: activeTab == ThemeTab.light
+                                          ? _iconColorAnimation.value
+                                          : _iconColorDarkAnimation.value,
+                                      size: 13.0,
+                                    )
+                                  : widget.emoji != null
+                                      ? Transform.translate(
+                                          offset: const Offset(0.0, -8.0),
+                                          child: Text(
+                                            widget.emoji!,
+                                            style: const TextStyle(
+                                              fontSize: 17.0,
+                                            ),
+                                          ),
+                                        )
+                                      : Container(
+                                          height: 13.0,
+                                          width: 13.0,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(5.9),
+                                            border: Border.all(
+                                              color: widget.color!,
+                                              width: 2.5,
+                                            ),
+                                          ),
+                                        ),
                             ),
                           ),
-                        )
-                ],
-              ),
-            );
-            // return Container(
-            //   width: MediaQuery.of(context).size.width,
-            //   padding: const EdgeInsets.symmetric(
-            //     vertical: 10,
-            //     horizontal: 10,
-            //   ),
-            //   margin: const EdgeInsets.only(
-            //     bottom: 10,
-            //   ),
-            //   decoration: BoxDecoration(
-            //     color: _buttonSelectedAnimation.value,
-            //     borderRadius: BorderRadius.circular(10),
-            //   ),
-            //   child: Container(
-            //     width: MediaQuery.of(context).size.width,
-            //     color: Colors.amber,
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.start,
-            //       children: [
-            //         Flexible(
-            //           child: Transform.translate(
-            //             offset: Offset(0.0, _buttonUpAnimation.value * -2.0),
-            //             child: widget.icon != null
-            //                 ? Icon(
-            //                     widget.icon,
-            //                     color: _iconColorAnimation.value,
-            //                     size: 16.0,
-            //                   )
-            //                 : widget.emoji != null
-            //                     ? Text(
-            //                         widget.emoji!,
-            //                         style: const TextStyle(
-            //                           fontSize: 16.0,
-            //                         ),
-            //                       )
-            //                     : Container(
-            //                         height: 16.0,
-            //                         width: 16.0,
-            //                         decoration: BoxDecoration(
-            //                           borderRadius:
-            //                               BorderRadius.circular(5.9),
-            //                           border: Border.all(
-            //                             color: widget.color!,
-            //                             width: 2.5,
-            //                           ),
-            //                         ),
-            //                       ),
-            //           ),
-            //         ),
-            //         // const SizedBox(
-            //         //   width: 13,
-            //         // ),
-            //         Expanded(
-            //           child: Text(
-            //             widget.title,
-            //             overflow: TextOverflow.ellipsis,
-            //             style: Theme.of(context).textTheme.bodyText1!.copyWith(
-            //                   color: widget.index == widget.currentIndex
-            //                       ? BrandColors.kBtnHoverColor
-            //                       : BrandColors.kBrandSecondary,
-            //                       fontSize: 13.0,
-            //                 ),
-            //           ),
-            //         ),
-            //         const Spacer(),
-            //         Container(
-            //           padding: const EdgeInsets.symmetric(
-            //             horizontal: 4.0,
-            //             vertical: 4.0,
-            //           ),
-            //           decoration: BoxDecoration(
-            //             color: BrandColors.kBrandTextDark,
-            //             borderRadius: BorderRadius.circular(8.0),
-            //           ),
-            //           child: Text(
-            //             '12',
-            //             style:
-            //                 Theme.of(context).textTheme.bodyText1!.copyWith(
-            //                       color: BrandColors.kBrandSecondary,
-            //                     ),
-            //           ),
-            //         )
-            //       ],
-            //     ),
-            //     // child: Row(
-            //     //   children: [
-            //     //     Flexible(
-            //     //       child: Transform.translate(
-            //     //         offset: Offset(0.0, _buttonUpAnimation.value * -2.0),
-            //     //         child: Stack(
-            //     //           children: [
-            //     //             Center(
-            //     //               child: widget.icon != null
-            //     //                   ? Icon(
-            //     //                       widget.icon,
-            //     //                       color: _iconColorAnimation.value,
-            //     //                       size: 16.0,
-            //     //                     )
-            //     //                   : widget.emoji != null
-            //     //                       ? Text(
-            //     //                           widget.emoji!,
-            //     //                           style: const TextStyle(
-            //     //                             fontSize: 16.0,
-            //     //                           ),
-            //     //                         )
-            //     //                       : Container(
-            //     //                           height: 16.0,
-            //     //                           width: 16.0,
-            //     //                           decoration: BoxDecoration(
-            //     //                             borderRadius:
-            //     //                                 BorderRadius.circular(5.9),
-            //     //                             border: Border.all(
-            //     //                               color: widget.color!,
-            //     //                               width: 2.5,
-            //     //                             ),
-            //     //                           ),
-            //     //                         ),
-            //     //             ),
-            //     //           ],
-            //     //         ),
-            //     //       ),
-            //     //     ),
-            //     //     const Flexible(
-            //     //       child: Text('Home'),
-            //     //     ),
-            //     //     const Flexible(
-            //     //       child: Text('Home'),
-            //     //     ),
-            //     //     const Flexible(
-            //     //       child: Text('Home'),
-            //     //     ),
-            //     //   ],
-            //     // ),
-            //   ),
-            // );
-          }),
-    );
+                    Positioned(
+                      top: 10,
+                      left: widget.hideIcons == true ? 0.0 : 30.0,
+                      child: Text(
+                        widget.title,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                              color: widget.index == widget.currentIndex
+                                  ? BrandColors.kBtnHoverColor
+                                  : Theme.of(context)
+                                      .textTheme
+                                      .bodyText1!
+                                      .color,
+                              fontSize: 13.0,
+                            ),
+                      ),
+                    ),
+                    widget.hideIcons == true
+                        ? Container()
+                        : Positioned(
+                            top: 10,
+                            right: 0.0,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4.0,
+                                vertical: 4.0,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    BrandColors.kBrandTextDark.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              child: Text(
+                                '12',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1!
+                                    .copyWith(
+                                      color: BrandColors.kBrandSecondary,
+                                      fontSize: 10.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
+                          )
+                  ],
+                ),
+              );
+            }),
+      );
+    });
   }
 }

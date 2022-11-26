@@ -17,4 +17,5 @@ class BrandColors {
   static const Color kGreenColor = Color(0xFF27d266);
   static const Color kCard1C1 = Color(0xFF5487e5);
   static const Color kCard1C2 = Color(0xFF1ea8f8);
+  static const Color kGreyColor = Color(0xFFeeeff1);
 }

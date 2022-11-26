@@ -7,9 +7,11 @@ import 'package:fake_dona_app/repository/web_client.dart';
 class LocalStorageRepository implements TodosRepository {
   final TodosRepository localStorage;
   final TodosRepository webClient;
+  final TodosRepository dbStorage;
 
   const LocalStorageRepository({
     required this.localStorage,
+    required this.dbStorage,
     this.webClient = const WebClient(),
   });
 
@@ -18,7 +20,8 @@ class LocalStorageRepository implements TodosRepository {
   @override
   Future<List<TodoEntity>> loadTodos() async {
     try {
-      return await localStorage.loadTodos();
+      //return await localStorage.loadTodos();
+      return await dbStorage.loadTodos();
     } catch (e) {
       final todos = await webClient.loadTodos();
 

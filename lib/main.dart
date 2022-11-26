@@ -1,3 +1,4 @@
+import 'package:fake_dona_app/repository/db_storage.dart';
 import 'package:fake_dona_app/repository/key_value_storage.dart';
 import 'package:fake_dona_app/repository/repository.dart';
 import 'package:fake_dona_app/run_app.dart';
@@ -12,5 +13,6 @@ Future<void> main() async {
       'fake-dona-app',
       await SharedPreferences.getInstance(),
     ),
+    dbStorage: DBSTORAGE(),
   ));
 }
